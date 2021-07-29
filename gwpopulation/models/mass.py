@@ -99,7 +99,7 @@ def double_power_law_peak_primary_mass(
     return prob
 
 def double_power_law_double_peak_primary_mass(
-    mass, alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
+    mass, alpha_1, alpha_2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
 ):
     r"""
     Broken power-law with two Gaussian components.
@@ -127,7 +127,7 @@ def double_power_law_double_peak_primary_mass(
         Powerlaw exponent for more massive black hole below break (:math:`\alpha_1`).
     alpha_2: float
         Powerlaw exponent for more massive black hole above break (:math:`\alpha_2`).
-    break_fraction:float
+    delta:float
         The fraction between mmin and mmax primary mass distribution breaks (:math:`\delta`).
     mmin: float
         Minimum black hole mass (:math:`m_\min`).
@@ -154,7 +154,7 @@ def double_power_law_double_peak_primary_mass(
         alpha_2=alpha_2,
         mmin=mmin,
         mmax=mmax,
-        break_fraction=break_fraction,
+        break_fraction=delta,
     )
     p_norm1 = truncnorm(mass, mu=mpp1, sigma=sigpp1, high=mmax, low=mmin)
     p_norm2 = truncnorm(mass, mu=mpp2, sigma=sigpp2, high=mmax, low=mmin)
@@ -407,7 +407,7 @@ def two_component_primary_mass_ratio(dataset, alpha, beta, mmin, mmax, lam, mpp,
     prob = p_m1 * p_q
     return prob
 
-def two_bump_broken_pl_primary_mass_ratio(dataset, alpha1, alpha2, beta, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
+def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
     r"""
     Power law model for two-dimensional mass distribution, modelling primary
     mass and conditional mass ratio distribution.
@@ -422,9 +422,9 @@ def two_bump_broken_pl_primary_mass_ratio(dataset, alpha1, alpha2, beta, mmin, m
     ----------
     dataset: dict
         Dictionary of numpy arrays for 'mass_1' and 'mass_ratio'.
-    alpha1: float
+    alpha_1: float
         Negative power law exponent at low masses for more massive black hole.
-    alpha2: float
+    alpha_2: float
         Negative power law exponent at high masses for more massive black hole.
     mmin: float
         Minimum black hole mass.
@@ -447,7 +447,7 @@ def two_bump_broken_pl_primary_mass_ratio(dataset, alpha1, alpha2, beta, mmin, m
     sigpp2: float
         Standard deviation of second Gaussian component.
     """
-    p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"], alpha1, alpha2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
+    p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"], alpha_1, alpha_2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
     p_q = powerlaw(dataset["mass_ratio"], beta, 1, mmin / dataset["mass_1"])
     prob = p_m1 * p_q
     return prob
