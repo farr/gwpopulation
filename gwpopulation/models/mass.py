@@ -447,7 +447,7 @@ def two_bump_broken_pl_primary_mass_ratio(dataset, alpha1, alpha2, beta, mmin, m
     sigpp2: float
         Standard deviation of second Gaussian component.
     """
-    p_m1 = double_power_law_primary_mass(dataset["mass_1"], alpha1, alpha2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
+    p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"], alpha1, alpha2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
     p_q = powerlaw(dataset["mass_ratio"], beta, 1, mmin / dataset["mass_1"])
     prob = p_m1 * p_q
     return prob
