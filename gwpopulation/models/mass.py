@@ -98,6 +98,68 @@ def double_power_law_peak_primary_mass(
     prob = (1 - lam) * p_pow + lam * p_norm
     return prob
 
+def double_power_law_double_peak_primary_mass(
+    mass, alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
+):
+    r"""
+    Broken power-law with two Gaussian components.
+
+    .. math::
+        p(m | \alpha_1, \alpha_2, m_\min, m_\max, \delta, \lambda_{1}, \mu_{1}, \sigma_{1}, \lambda_{2}, \mu_{2}, \sigma_{2}) =
+        (1 - \lambda_1 - \lambda_2) p_{\text{bpl}}(m | \alpha_1, \alpha_2, m_\min, m_\max, \delta)
+        + \lambda_{1} p_{\text{norm}}(m | \mu_1, \sigma_1)
+        + \lambda_{2} p_{\text{norm}}(m | \mu_2, \sigma_2)
+
+    .. math::
+        p_{\text{bpl}}(m | \alpha_1, m_\min, m_\max, \delta) &\propto \begin{cases}
+            m^{-\alpha_1} : m_\min \leq m < m_\min + \delta (m_\max - m_\min)\\
+            m^{-\alpha_2} : m_\min + \delta (m_\max - m_\min) \leq m < m_\max
+        \end{cases}
+
+    .. math::
+        p_{\text{norm}}(m | \mu_m, \sigma_m) \propto \exp\left(-\frac{(m - \mu_{m})^2}{2\sigma^2_m}\right)
+
+    Parameters
+    ----------
+    mass: array-like
+        Mass to evaluate probability at (:math:`m`).
+    alpha_1: float
+        Powerlaw exponent for more massive black hole below break (:math:`\alpha_1`).
+    alpha_2: float
+        Powerlaw exponent for more massive black hole above break (:math:`\alpha_2`).
+    break_fraction:float
+        The fraction between mmin and mmax primary mass distribution breaks (:math:`\delta`).
+    mmin: float
+        Minimum black hole mass (:math:`m_\min`).
+    mmax: float
+        Maximum mass in the powerlaw distributed component (:math:`m_\max`).
+    lam1: float
+        Fraction of black holes in first Gaussian component (:math:`\lambda_m`).
+    mpp1: float
+        Mean of first Gaussian component (:math:`\mu_m`).
+    sigpp1: float
+        Standard deviation of first Gaussian component (:math:`\sigma_m`).
+    lam2: float
+        Fraction of black holes in second Gaussian component.
+    mpp2: float
+        Mean of second Gaussian component.
+    sigpp2: float
+        Standard deviation of second Gaussian component.
+
+    """
+
+    p_pow = double_power_law_primary_mass(
+        mass=mass,
+        alpha_1=alpha_1,
+        alpha_2=alpha_2,
+        mmin=mmin,
+        mmax=mmax,
+        break_fraction=break_fraction,
+    )
+    p_norm1 = truncnorm(mass, mu=mpp1, sigma=sigpp1, high=mmax, low=mmin)
+    p_norm2 = truncnorm(mass, mu=mpp2, sigma=sigpp2, high=mmax, low=mmin)
+    prob = (1 - lam1 - lam2) * p_pow + lam1 * p_norm1 + lam2 * p_norm2
+    return prob
 
 def double_power_law_primary_power_law_mass_ratio(
     dataset, alpha_1, alpha_2, beta, mmin, mmax, break_fraction
@@ -345,6 +407,50 @@ def two_component_primary_mass_ratio(dataset, alpha, beta, mmin, mmax, lam, mpp,
     prob = p_m1 * p_q
     return prob
 
+def two_bump_broken_pl_primary_mass_ratio(dataset, alpha1, alpha2, beta, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
+    r"""
+    Power law model for two-dimensional mass distribution, modelling primary
+    mass and conditional mass ratio distribution.
+
+    .. math::
+        p(m_1, q) = p(m1) p(q | m_1)
+
+    The primary mass distribution is a broken power law with two Gaussian bumps
+    (see `double_power_law_double_peak_primary_mass`).
+
+    Parameters
+    ----------
+    dataset: dict
+        Dictionary of numpy arrays for 'mass_1' and 'mass_ratio'.
+    alpha1: float
+        Negative power law exponent at low masses for more massive black hole.
+    alpha2: float
+        Negative power law exponent at high masses for more massive black hole.
+    mmin: float
+        Minimum black hole mass.
+    mmax: float
+        Maximum black hole mass.
+    beta: float
+        Power law exponent of the mass ratio distribution.
+    delta: float
+        break in power law at `mmin + delta*(mmax-mmax)`.
+    lam1: float
+        Fraction of black holes in first Gaussian component.
+    mpp1: float
+        Mean of first Gaussian component.
+    sigpp1: float
+        Standard deviation of first Gaussian component.
+    lam2: float
+        Fraction of black holes in second Gaussian component.
+    mpp2: float
+        Mean of second Gaussian component.
+    sigpp2: float
+        Standard deviation of second Gaussian component.
+    """
+    p_m1 = double_power_law_primary_mass(dataset["mass_1"], alpha1, alpha2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
+    p_q = powerlaw(dataset["mass_ratio"], beta, 1, mmin / dataset["mass_1"])
+    prob = p_m1 * p_q
+    return prob
 
 def two_component_primary_secondary_independent(
     dataset, alpha, beta, mmin, mmax, lam, mpp, sigpp
