@@ -99,7 +99,7 @@ def double_power_law_peak_primary_mass(
     return prob
 
 def double_power_law_double_peak_primary_mass(
-    mass, alpha_1, alpha_2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
+    mass, alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
 ):
     r"""
     Broken power-law with two Gaussian components.
@@ -154,7 +154,7 @@ def double_power_law_double_peak_primary_mass(
         alpha_2=alpha_2,
         mmin=mmin,
         mmax=mmax,
-        break_fraction=delta,
+        break_fraction=break_fraction,
     )
     p_norm1 = truncnorm(mass, mu=mpp1, sigma=sigpp1, high=mmax, low=mmin)
     p_norm2 = truncnorm(mass, mu=mpp2, sigma=sigpp2, high=mmax, low=mmin)
@@ -407,7 +407,8 @@ def two_component_primary_mass_ratio(dataset, alpha, beta, mmin, mmax, lam, mpp,
     prob = p_m1 * p_q
     return prob
 
-def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
+def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta,
+mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
     r"""
     Power law model for two-dimensional mass distribution, modelling primary
     mass and conditional mass ratio distribution.
@@ -432,8 +433,8 @@ def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta, mmin,
         Maximum black hole mass.
     beta: float
         Power law exponent of the mass ratio distribution.
-    delta: float
-        break in power law at `mmin + delta*(mmax-mmax)`.
+    break_fraction: float
+        break in power law at `mmin + break_fraction*(mmax-mmin)`.
     lam1: float
         Fraction of black holes in first Gaussian component.
     mpp1: float
@@ -447,7 +448,8 @@ def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta, mmin,
     sigpp2: float
         Standard deviation of second Gaussian component.
     """
-    p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"], alpha_1, alpha_2, mmin, mmax, delta, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
+    p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"],
+    alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
     p_q = powerlaw(dataset["mass_ratio"], beta, 1, mmin / dataset["mass_1"])
     prob = p_m1 * p_q
     return prob
