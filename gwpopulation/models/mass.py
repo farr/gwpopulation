@@ -99,7 +99,8 @@ def double_power_law_peak_primary_mass(
     return prob
 
 def double_power_law_double_peak_primary_mass(
-    mass, alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2
+    mass, alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp_1, sigpp_1,
+    lam2, mpp_2, sigpp_2
 ):
     r"""
     Broken power-law with two Gaussian components.
@@ -135,15 +136,15 @@ def double_power_law_double_peak_primary_mass(
         Maximum mass in the powerlaw distributed component (:math:`m_\max`).
     lam1: float
         Fraction of black holes in first Gaussian component (:math:`\lambda_m`).
-    mpp1: float
+    mpp_1: float
         Mean of first Gaussian component (:math:`\mu_m`).
-    sigpp1: float
+    sigpp_1: float
         Standard deviation of first Gaussian component (:math:`\sigma_m`).
     lam2: float
         Fraction of black holes in second Gaussian component.
-    mpp2: float
+    mpp_2: float
         Mean of second Gaussian component.
-    sigpp2: float
+    sigpp_2: float
         Standard deviation of second Gaussian component.
 
     """
@@ -156,8 +157,8 @@ def double_power_law_double_peak_primary_mass(
         mmax=mmax,
         break_fraction=break_fraction,
     )
-    p_norm1 = truncnorm(mass, mu=mpp1, sigma=sigpp1, high=mmax, low=mmin)
-    p_norm2 = truncnorm(mass, mu=mpp2, sigma=sigpp2, high=mmax, low=mmin)
+    p_norm1 = truncnorm(mass, mu=mpp_1, sigma=sigpp_1, high=mmax, low=mmin)
+    p_norm2 = truncnorm(mass, mu=mpp_2, sigma=sigpp_2, high=mmax, low=mmin)
     prob = (1 - lam1 - lam2) * p_pow + lam1 * p_norm1 + lam2 * p_norm2
     return prob
 
@@ -408,7 +409,7 @@ def two_component_primary_mass_ratio(dataset, alpha, beta, mmin, mmax, lam, mpp,
     return prob
 
 def two_bump_broken_pl_primary_mass_ratio(dataset, alpha_1, alpha_2, beta,
-mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
+mmin, mmax, break_fraction, lam1, mpp_1, sigpp_1, lam2, mpp_2, sigpp_2):
     r"""
     Power law model for two-dimensional mass distribution, modelling primary
     mass and conditional mass ratio distribution.
@@ -437,19 +438,20 @@ mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2):
         break in power law at `mmin + break_fraction*(mmax-mmin)`.
     lam1: float
         Fraction of black holes in first Gaussian component.
-    mpp1: float
+    mpp_1: float
         Mean of first Gaussian component.
-    sigpp1: float
+    sigpp_1: float
         Standard deviation of first Gaussian component.
     lam2: float
         Fraction of black holes in second Gaussian component.
-    mpp2: float
+    mpp_2: float
         Mean of second Gaussian component.
-    sigpp2: float
+    sigpp_2: float
         Standard deviation of second Gaussian component.
     """
     p_m1 = double_power_law_double_peak_primary_mass(dataset["mass_1"],
-    alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp1, sigpp1, lam2, mpp2, sigpp2)
+    alpha_1, alpha_2, mmin, mmax, break_fraction, lam1, mpp_1, sigpp_1, lam2,
+    mpp_2, sigpp_2)
     p_q = powerlaw(dataset["mass_ratio"], beta, 1, mmin / dataset["mass_1"])
     prob = p_m1 * p_q
     return prob
