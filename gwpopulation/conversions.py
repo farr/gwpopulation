@@ -129,3 +129,8 @@ def mu_var_max_to_alpha_beta_max(mu, var, amax):
     alpha = (mu ** 2 * (1 - mu) - mu * var) / var
     beta = (mu * (1 - mu) ** 2 - (1 - mu) * var) / var
     return alpha, beta, amax
+
+def convert_lam_pl(parameters):
+    conv_params = parameters.copy()
+    conv_params['lam_pl'] = 1 - conv_params['lam1'] - conv_params['lam2']
+    return conv_params
